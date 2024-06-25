@@ -57,24 +57,31 @@ class ProductPricelistItem(models.Model):
                 ("base", "=", "pricelist"),
                 ("base_pricelist_id", "in", self.pricelist_id.ids),
             ]
+        ).read(
+            fields=["id", "base_pricelist_id"],
+            load=None,  # load M2Os as ID integers
         )
+
         base_pricelist_to_items = {}
+
         for base_pricelist_item in base_pricelist_items:
-            base_pricelist = base_pricelist_item.base_pricelist_id
-            existing_items = base_pricelist_to_items.get(base_pricelist, self.browse())
-            if not existing_items:
-                base_pricelist_to_items[base_pricelist] = base_pricelist_item
+            base_pricelist_id = base_pricelist_item["base_pricelist_id"]
+            if base_pricelist_id not in base_pricelist_to_items:
+                base_pricelist_to_items[base_pricelist_id] = [base_pricelist_item["id"]]
             else:
-                base_pricelist_to_items[base_pricelist] |= base_pricelist_item
+                base_pricelist_to_items[base_pricelist_id].append(
+                    base_pricelist_item["id"]
+                )
 
         # Find rules having same applicability
         same_applicability_depending_items = self.browse()
         for changed_item in self:
-            changed_pricelist = changed_item.pricelist_id
+            changed_pricelist = changed_item.pricelist_id.id
             depending_items = base_pricelist_to_items.get(
                 changed_pricelist,
-                self.browse(),
+                [],
             )
+            depending_items = self.browse(depending_items)
             for depending_item in depending_items:
                 if changed_item._has_same_product_applicability(depending_item):
                     same_applicability_depending_items |= depending_item
