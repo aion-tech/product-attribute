@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+~ Copyright 2025 Simone Rubino - Aion Tech
+~ Copyright 2025 Luca Magnani - Aion Tech
+~ License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+-->
+<odoo>
+    <record id="product_attribute_view_form" model="ir.ui.view">
+        <field name="name">Add variant creation to attribute values</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='value_ids']/tree" position="inside">
+                <field
+                    name="create_custom_variant"
+                    groups="product.group_product_variant"
+                    optional="hide"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_attribute_product_tree_view" model="ir.ui.view">
+        <field name="name">product.product.tree.view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_template_variant_value_ids']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_template_variant_value_ids']" position="after">
+                <field name="product_template_attribute_value_ids" widget="many2many_tags" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
