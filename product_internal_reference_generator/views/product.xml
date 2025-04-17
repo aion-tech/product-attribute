@@ -135,6 +135,9 @@
                 <attribute name="attrs" operation="update">
                     {'readonly': [('default_code', '!=', False)]}
                 </attribute>
+                <attribute name="force_save">
+                    1
+                </attribute>
                 <attribute
                     name="groups"
                 >!product_internal_reference_generator.group_int_ref_template_always_visible</attribute>
